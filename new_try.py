@@ -32,8 +32,8 @@ def player_movement(position_x,position_y,maze_surface):
     elif keys[pygame.K_a]:
         new_x -= 5
     
-    if pygame.Color(pygame.Surface.get_at(maze_surface,(int(new_x + window_width//2),int(new_y + window_height//2)))).a == 0:
-        return new_x, new_y
+    if pygame.Color(pygame.Surface.get_at(maze_surface,(int(new_x + window_width//2),int(new_y + window_height//2)))).r == 0 and pygame.Color(pygame.Surface.get_at(maze_surface,(int(new_x + window_width//2),int(new_y + window_height//2)))).g == 0 and pygame.Color(pygame.Surface.get_at(maze_surface,(int(new_x + window_width//2),int(new_y + window_height//2)))).b == 0:
+        return new_x,new_y
     else:
         return position_x, position_y
     #return new_x, new_y
@@ -72,7 +72,7 @@ class Worm(pygame.sprite.Sprite):
         self.image = pygame.transform.rotate(self.image, 90)
         self.image = pygame.transform.scale(self.image, (25,100))
         self.rect = self.image.get_rect(center=(coordinate_x,coordinate_y))
-        self.gravity = 7
+        self.gravity = 5
 
     def update(self): #apply fall
         self.rect.y += self.gravity
@@ -80,16 +80,14 @@ class Worm(pygame.sprite.Sprite):
             self.kill()
 
 def is_collision():
-    if pygame.sprite.spritecollide(player_2.sprite, worm_group, False):
+    if pygame.sprite.spritecollide(player.sprite, worm_group, False):
         worm_group.empty()
         return False
     return True 
 
-main_maze = pygame.image.load("overtop.png")
-
 background_2 = pygame.image.load("Library_background.png")
 background_2_fin = pygame.transform.scale(background_2, (window_width,window_height))
-background_1 = background_2
+    
 fallist = []
 for i in range(5):
     x=(i+1)*window_width//6
@@ -103,11 +101,9 @@ start_point_y = player_pos_y
 
 clock = pygame.time.Clock()
 
-
-mazer_surface = main_maze
+mazer_surface = pygame.image.load("new_try.png")
 width_mz, height_mz = mazer_surface.get_size()  
 mazer_surface = pygame.transform.scale(mazer_surface, (int(width_mz*1.5), int(height_mz*1.5)))  
-background_1 = pygame.transform.scale(background_1,(int(width_mz*1.5), int(height_mz*1.5)))
 #zvaž zvětšení a scale
 
 #GROUPS
@@ -137,21 +133,19 @@ while True:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 if game_active == False:
-                    screen.fill((0,0,0))
                     game_active = True
                     game_1_active = True
-                    game_2_active = False
                     player_pos_x = start_point_x
                     player_pos_y = start_point_y
     
     if game_active:
         if game_1_active:
             score_1 += 1
-            #screen.fill((0,0,0))
+            screen.fill((0,0,0))
             player_pos_x,player_pos_y = player_movement(player_pos_x,player_pos_y,mazer_surface)
             drobecek = Drobek((int(player_pos_x + window_width//2),int(player_pos_y + window_height//2)))
             Jenicek_a_Marenka.add(drobecek)
-            screen.blit(background_1, (-player_pos_x,-player_pos_y))
+
             screen.blit(mazer_surface,(-player_pos_x,-player_pos_y))
             player.draw(screen)
             Jenicek_a_Marenka.draw(screen)
@@ -176,7 +170,7 @@ while True:
             worm_group.draw(screen)
             game_active = is_collision()
             if score_2 < 1200 and score_2 >=0:
-                if score_2 % 80 == 0:
+                if score_2 % 60 == 0:
                     for i in range(5):
                         if random.randint(1,200)%2 == 1:
                             worm = Worm(fallist[i], window_height//6)
